@@ -1,1 +1,1 @@
-include ':app', ':sharedprefs'
+include ':app', ':sharedprefs', ':framework'

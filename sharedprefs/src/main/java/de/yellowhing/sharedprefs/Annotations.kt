@@ -6,4 +6,4 @@ public annotation class SharedPrefs(val name: String, val mode: Int = 0)
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-public annotation class Alias(val key: String)
+public annotation class Alias(val value: String)

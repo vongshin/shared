@@ -12,6 +12,6 @@ class Person {
     var accout: Float by Preference()
     var id  by Preference<Long>()
     @Alias("name")
-    var name by Preference<String>()
+    var name:String? by Preference()
     var names: Set<String>? by Preference()
 }

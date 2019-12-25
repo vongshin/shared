@@ -13,8 +13,8 @@ class MainActivity : AppCompatActivity() {
         var p = Person()
         name = p.name
         Log.d("p before name", "ss"+p.name);
-        p.name = "huangxing"
-        Log.d("p after name", p.name);
+        p.name = "jake"
+        Log.d("p after name", "sssss"+p.name);
 
         Log.d("p before sex", "ss"+p.sex);
         p.sex = true
@@ -39,5 +39,16 @@ class MainActivity : AppCompatActivity() {
         hh.add("bbb")
         p.names = hh
         Log.d("p after id","ss" + p.names);
+
+
+        name = p.name
+        Log.d("p before name", "ssss"+p.name);
+        p.name = null
+        Log.d("p after name","ssss" + p.name);
+
+
+        Log.d("p before id", "ssss"+p.names);
+        p.names = null
+        Log.d("p after id","ssss" + p.names);
     }
 }

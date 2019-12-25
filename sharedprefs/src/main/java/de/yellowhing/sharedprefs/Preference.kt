@@ -11,14 +11,15 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.jvmName
 
+@Suppress("UNCHECKED_CAST")
 class Preference<T> : ReadWriteProperty<Any, T> {
+
     private var defValue: T? = null
+
     private val context: Context;
 
-    constructor(defValue: T? = null){
-        this.defValue = null
-        this.context = AppGlobals.getInitialApplication()
-    }
+    constructor(context: Context):this(null, context)
+
     constructor(defValue: T? = null, context: Context = AppGlobals.getInitialApplication()){
         this.defValue = defValue
         this.context = context
@@ -28,34 +29,26 @@ class Preference<T> : ReadWriteProperty<Any, T> {
         val key = getKey(property)
         when(property.returnType.classifier){
             Boolean::class -> {
-                defValue = if(defValue == null) defaultBooleanValue as T else defValue
+                defValue = defValue?: defaultBooleanValue as T
                 return sp.getBoolean(key, defValue as Boolean) as T
             }
             Int::class -> {
-                defValue = if(defValue == null) defaultIntValue as T else defValue
+                defValue = defValue?: defaultIntValue as T
                 return sp.getInt(key, defValue as Int) as T
             }
             Float::class -> {
-                defValue = if(defValue == null) defaultFloatValue as T else defValue
+                defValue = defValue?: defaultFloatValue as T
                 return sp.getFloat(key, defValue as Float) as T
             }
             Long::class ->{
-                defValue = if(defValue == null) defaultLongValue as T else defValue
+                defValue = defValue?: defaultLongValue as T
                 return sp.getLong(key, defValue as Long) as T
             }
             String::class ->{
-                if(defValue == null){
-                    return sp.getString(key, defaultStringValue) as T
-                }else{
-                    return sp.getString(key, defValue as String) as T
-                }
+                return sp.getString(key, defValue as? String) as T
             }
             isSuperclassOf(property.returnType.classifier as KClass<*>) -> {
-                if(defValue == null){
-                    return sp.getStringSet(key, defaultSetStringValue) as T
-                }else{
-                    return sp.getStringSet(key, defValue as Set<String>) as T
-                }
+                return sp.getStringSet(key, defValue as? Set<String>) as T
             }
             else -> {
                 throw UnsupportedOperationException()
@@ -68,25 +61,35 @@ class Preference<T> : ReadWriteProperty<Any, T> {
         val sp = getSharedPrefs(context, thisRef)
         val key = getKey(property)
         when(property.returnType.classifier){
-            Boolean::class -> { sp.edit().putBoolean(key, value as Boolean).apply() }
-            Int::class -> { sp.edit().putInt(key, value as Int).apply() }
-            Float::class -> { sp.edit().putFloat(key, value as Float).apply() }
-            Long::class -> { sp.edit().putLong(key, value as Long).apply() }
-            String::class ->{ sp.edit().putString(key, value as String).apply()}
-            isSuperclassOf(property.returnType.classifier as KClass<*>) -> {
-                sp.edit().putStringSet(key, value as Set<String>).apply()
+            Boolean::class -> {
+                sp.edit().putBoolean(key, value as Boolean).apply()
             }
-            else ->{ throw UnsupportedOperationException()}
+            Int::class -> {
+                sp.edit().putInt(key, value as Int).apply()
+            }
+            Float::class -> {
+                sp.edit().putFloat(key, value as Float).apply()
+            }
+            Long::class -> {
+                sp.edit().putLong(key, value as Long).apply()
+            }
+            String::class ->{
+                sp.edit().putString(key, value as? String).apply()
+            }
+            isSuperclassOf(property.returnType.classifier as KClass<*>) -> {
+                sp.edit().putStringSet(key, value as? Set<String>).apply()
+            }
+            else ->{ throw UnsupportedOperationException() }
         }
     }
 
     companion object{
-        val defaultBooleanValue: Boolean = false
-        val defaultIntValue: Int = 0
-        val defaultFloatValue: Float = 0.0f
-        val defaultLongValue: Long = 0L
-        val defaultStringValue: String? = null
-        val defaultSetStringValue: Set<String>? = null
+        const val defaultBooleanValue: Boolean = false
+        const val defaultIntValue: Int = 0
+        const val defaultFloatValue: Float = 0.0f
+        const val defaultLongValue: Long = 0L
+//        val defaultStringValue: String? = null
+//        val defaultSetStringValue: Set<String>? = null
         /**
          * find sharedPrefs
          */
@@ -109,7 +112,7 @@ class Preference<T> : ReadWriteProperty<Any, T> {
             var key: String = property.name
             val alias = property.findAnnotation<Alias>()
             if (alias != null) {
-                key = alias.key
+                key = alias.value
             }
             return key;
         }
